@@ -1,6 +1,6 @@
 # Quark Container Runtime 🚀
 
-![Quark Demo](demo.png)
+![Quark Demo](demo.jpg)
 
 **Quark** is a lightweight, zero-dependency container runtime written in C. It demonstrates the core principles of containerization (Namespaces, Cgroups, Chroot) in a single, readable codebase.
 
