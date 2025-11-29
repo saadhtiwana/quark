@@ -1014,17 +1014,6 @@ void monitor_dashboard() {
                     }
                     args[arg_idx] = NULL;
                     
-                    // Run in FOREGROUND so user can see output
-                    def_prog_mode();
-                    endwin();
-                    
-                    // Show cursor for the command output
-                    curs_set(1);
-                    
-                    // Ignore signals in parent so Ctrl+C doesn't kill the TUI
-                    signal(SIGINT, SIG_IGN);
-                    signal(SIGQUIT, SIG_IGN);
-                    
                     printf("------------------------------------------------\n");
                     printf("Running container '%s'...\n", sel->name); 
                     printf("------------------------------------------------\n");
@@ -1045,7 +1034,6 @@ void monitor_dashboard() {
                     reset_prog_mode();
                     refresh();
                     curs_set(0); // Hide cursor again
-                    
                 } else {
                     // Default to shell: Start detached, then AUTO-ENTER
                     run_container(sel->name, NULL, 100, 512, 1); 
