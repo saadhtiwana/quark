@@ -1,0 +1,14 @@
+# Binaries
+quark
+workload
+
+# Object files
+*.o
+
+# Temporary Directories
+rootfs/
+tmp/
+
+# Editor/System files
+.DS_Store
+.vscode/
