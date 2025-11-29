@@ -1018,6 +1018,9 @@ void monitor_dashboard() {
                     def_prog_mode();
                     endwin();
                     
+                    // Show cursor for the command output
+                    curs_set(1);
+                    
                     // Ignore signals in parent so Ctrl+C doesn't kill the TUI
                     signal(SIGINT, SIG_IGN);
                     signal(SIGQUIT, SIG_IGN);
@@ -1030,7 +1033,10 @@ void monitor_dashboard() {
                     
                     printf("\n------------------------------------------------\n");
                     printf("Process finished. Press ENTER to return...");
-                    while(getchar() != '\n');
+                    
+                    // Flush input buffer then wait for Enter
+                    int c;
+                    while ((c = getchar()) != '\n' && c != EOF);
                     
                     // Restore signals
                     signal(SIGINT, SIG_DFL);
@@ -1038,6 +1044,7 @@ void monitor_dashboard() {
                     
                     reset_prog_mode();
                     refresh();
+                    curs_set(0); // Hide cursor again
                     
                 } else {
                     // Default to shell: Start detached, then AUTO-ENTER
@@ -1046,8 +1053,10 @@ void monitor_dashboard() {
                     // Auto-Enter logic
                     def_prog_mode();
                     endwin();
+                    curs_set(1); // Show cursor for shell
                     
                     printf("Entering container '%s'...\n", sel->name);
+                    printf("Type 'exit' to return to dashboard.\n");
                     
                     pid_t child = fork();
                     if (child == 0) {
@@ -1060,6 +1069,7 @@ void monitor_dashboard() {
                     
                     reset_prog_mode();
                     refresh();
+                    curs_set(0); // Hide cursor again
                 }
             }
             else if (ch == 's') { // This was missing in the diff, but was in original code.
@@ -1075,19 +1085,13 @@ void monitor_dashboard() {
                 } else {
                     def_prog_mode();
                     endwin();
+                    curs_set(1); // Show cursor
                     
                     printf("Entering container '%s'...\n", sel->name);
-                    char cmd[512];
-                    // We need to use system() to invoke the 'enter' command logic we added to main
-                    // But since we are inside the binary, we can't easily fork/exec ourselves cleanly without state issues.
-                    // Easiest way: construct the enter command manually here.
-                    // Actually, we can just call the same logic as 'enter' command.
+                    printf("Type 'exit' to return to dashboard.\n");
                     
                     pid_t child = fork();
                     if (child == 0) {
-                        // We are child, we want to enter the namespace
-                        // But wait, we are the monitor. We need to join the namespace of the target pid.
-                        // The 'exec_container' function does exactly that.
                         char *shell[] = {"/bin/sh", NULL};
                         exec_container(sel->name, shell);
                         exit(1);
@@ -1097,6 +1101,7 @@ void monitor_dashboard() {
                     
                     reset_prog_mode();
                     refresh();
+                    curs_set(0); // Hide cursor
                 }
             }
         }
